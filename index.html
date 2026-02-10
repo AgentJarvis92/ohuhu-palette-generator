@@ -176,20 +176,23 @@
 
         .palette {
             display: flex;
+            flex-direction: column;
             gap: 15px;
             margin-bottom: 20px;
-            overflow-x: auto;
         }
 
         .color-swatch {
             position: relative;
-            flex: 1;
-            min-width: 150px;
-            height: 180px;
+            width: 100%;
+            height: 120px;
             border-radius: 12px;
             cursor: grab;
             transition: all 0.3s;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
         }
 
         .color-swatch:hover {
@@ -202,24 +205,25 @@
             cursor: grabbing;
         }
 
+        .color-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
         .color-code {
-            position: absolute;
-            bottom: 15px;
-            left: 15px;
             background: rgba(255, 255, 255, 0.95);
-            padding: 5px 10px;
+            padding: 5px 12px;
             border-radius: 6px;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 16px;
             color: #333;
+            display: inline-block;
         }
 
         .lock-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border: none;
             background: rgba(255, 255, 255, 0.9);
             border-radius: 8px;
@@ -228,6 +232,7 @@
             align-items: center;
             justify-content: center;
             transition: all 0.3s;
+            flex-shrink: 0;
         }
 
         .lock-btn:hover {
@@ -250,13 +255,13 @@
         }
 
         .color-name {
-            text-align: center;
-            padding-top: 10px;
             font-size: 14px;
-            color: #666;
+            color: rgba(0, 0, 0, 0.6);
             font-weight: 500;
-            flex: 1;
-            min-width: 150px;
+        }
+        
+        #colorNames, #imageColorNames {
+            display: none !important;
         }
 
         .instructions {
@@ -373,12 +378,16 @@
             }
             
             .color-swatch {
-                min-width: 120px;
-                height: 140px;
+                height: 100px;
+                padding: 0 15px;
+            }
+            
+            .color-code {
+                font-size: 14px;
             }
             
             .color-name {
-                min-width: 120px;
+                font-size: 12px;
             }
         }
     </style>
@@ -759,9 +768,7 @@
 
         function renderPalette() {
             const palette = document.getElementById('palette');
-            const colorNames = document.getElementById('colorNames');
             palette.innerHTML = '';
-            colorNames.innerHTML = '';
             
             currentPalette.forEach((color, index) => {
                 const swatch = document.createElement('div');
@@ -771,6 +778,10 @@
                 swatch.dataset.index = index;
                 
                 swatch.innerHTML = `
+                    <div class="color-info">
+                        <div class="color-code">${color.code}</div>
+                        <div class="color-name">${color.name}</div>
+                    </div>
                     <button class="lock-btn ${lockedColors.has(index) ? 'locked' : ''}" onclick="toggleLock(${index}, event)">
                         <svg viewBox="0 0 24 24">
                             ${lockedColors.has(index) 
@@ -779,7 +790,6 @@
                             }
                         </svg>
                     </button>
-                    <div class="color-code">${color.code}</div>
                 `;
                 
                 swatch.addEventListener('dragstart', handleDragStart);
@@ -788,11 +798,6 @@
                 swatch.addEventListener('dragend', handleDragEnd);
                 
                 palette.appendChild(swatch);
-                
-                const name = document.createElement('div');
-                name.className = 'color-name';
-                name.textContent = color.name;
-                colorNames.appendChild(name);
             });
         }
 
@@ -1008,21 +1013,19 @@
 
         function renderImagePalette(palette) {
             const container = document.getElementById('imagePalette');
-            const names = document.getElementById('imageColorNames');
             container.innerHTML = '';
-            names.innerHTML = '';
             
             palette.forEach(color => {
                 const swatch = document.createElement('div');
                 swatch.className = 'color-swatch';
                 swatch.style.backgroundColor = color.hex;
-                swatch.innerHTML = `<div class="color-code">${color.code}</div>`;
+                swatch.innerHTML = `
+                    <div class="color-info">
+                        <div class="color-code">${color.code}</div>
+                        <div class="color-name">${color.name}</div>
+                    </div>
+                `;
                 container.appendChild(swatch);
-                
-                const name = document.createElement('div');
-                name.className = 'color-name';
-                name.textContent = color.name;
-                names.appendChild(name);
             });
         }
 
