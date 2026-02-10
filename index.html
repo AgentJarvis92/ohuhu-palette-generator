@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ohuhu Honolulu B Palette Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        select {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        select:hover {
+            border-color: #667eea;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .generate-btn {
+            padding: 12px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .palette {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .color-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: move;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .color-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-card.dragging {
+            opacity: 0.5;
+        }
+
+        .color-swatch {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            flex-shrink: 0;
+        }
+
+        .color-info {
+            flex: 1;
+        }
+
+        .color-code {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .color-name {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .lock-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .lock-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .lock-btn.locked {
+            background: #667eea;
+        }
+
+        .lock-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: #666;
+        }
+
+        .lock-btn.locked svg {
+            fill: white;
+        }
+
+        .instructions {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .drag-icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.3;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Ohuhu Honolulu B Palette Generator</h1>
+        <p class="subtitle">Create perfect color combinations from 216 alcohol markers</p>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="paletteSize">Palette Size</label>
+                <select id="paletteSize">
+                    <option value="4">4 colors</option>
+                    <option value="5" selected>5 colors</option>
+                    <option value="6">6 colors</option>
+                    <option value="7">7 colors</option>
+                </select>
+            </div>
+            
+            <button class="generate-btn" onclick="generatePalette()">
+                🎲 Generate Palette
+            </button>
+        </div>
+
+        <div class="palette" id="palette"></div>
+
+        <div class="instructions">
+            🔒 Click lock icon to keep a color • 🎲 Generate randomizes unlocked colors • ✋ Drag cards to reorder
+        </div>
+    </div>
+
+    <script>
+        // Ohuhu Honolulu B 216 color database
+        // Note: This is a starter set - we'll need to complete with all 216 colors
+        const ohuhuColors = [
+            { code: "R000", name: "Pale Pink", hex: "#FFE5E5" },
+            { code: "R00", name: "Pinkish White", hex: "#FFDDE0" },
+            { code: "R01", name: "Pink", hex: "#FFD1DC" },
+            { code: "R02", name: "Rose Pink", hex: "#FFC0CB" },
+            { code: "R05", name: "Salmon Pink", hex: "#FFA69E" },
+            { code: "R08", name: "Vermilion", hex: "#FF6B6B" },
+            { code: "R11", name: "Pale Cherry Pink", hex: "#FFB3BA" },
+            { code: "R12", name: "Light Tea Rose", hex: "#FFA4A9" },
+            { code: "R14", name: "Light Rouge", hex: "#FF8B94" },
+            { code: "R17", name: "Lipstick Orange", hex: "#FF6B7A" },
+            { code: "R20", name: "Blush", hex: "#FFB6C1" },
+            { code: "R21", name: "Sardonyx", hex: "#F98B88" },
+            { code: "R22", name: "Light Prawn", hex: "#FF9A8B" },
+            { code: "R24", name: "Prawn", hex: "#FF6B6B" },
+            { code: "R27", name: "Cadmium Red", hex: "#E63946" },
+            { code: "R29", name: "Lipstick Red", hex: "#DC143C" },
+            { code: "R32", name: "Peach Red", hex: "#FF9F9F" },
+            { code: "R35", name: "Coral", hex: "#FF6B6B" },
+            { code: "R37", name: "Carmine", hex: "#D70040" },
+            { code: "R39", name: "Garnet", hex: "#9B1B30" },
+            
+            { code: "YR00", name: "Powder Pink", hex: "#FFEEF0" },
+            { code: "YR01", name: "Peach Puff", hex: "#FFDAB9" },
+            { code: "YR02", name: "Light Orange", hex: "#FFCBA4" },
+            { code: "YR04", name: "Chrome Orange", hex: "#FFA500" },
+            { code: "YR07", name: "Cadmium Orange", hex: "#FF8C00" },
+            { code: "YR09", name: "Chinese Orange", hex: "#FF7518" },
+            { code: "YR12", name: "Loquat", hex: "#FFB347" },
+            { code: "YR14", name: "Caramel", hex: "#DAA520" },
+            { code: "YR15", name: "Pumpkin Yellow", hex: "#FF8C00" },
+            { code: "YR16", name: "Apricot", hex: "#FBCEB1" },
+            { code: "YR18", name: "Sanguine", hex: "#C04000" },
+            { code: "YR20", name: "Yellowish Shade", hex: "#FFE5B4" },
+            { code: "YR21", name: "Cream", hex: "#FFFDD0" },
+            { code: "YR23", name: "Yellow Ochre", hex: "#CC7722" },
+            { code: "YR24", name: "Pale Sepia", hex: "#C9A87C" },
+            
+            { code: "Y000", name: "Pale Lemon", hex: "#FFFACD" },
+            { code: "Y00", name: "Barium Yellow", hex: "#FFFF99" },
+            { code: "Y02", name: "Canary Yellow", hex: "#FFEF00" },
+            { code: "Y04", name: "Acacia", hex: "#F4C430" },
+            { code: "Y06", name: "Yellow", hex: "#FFFF00" },
+            { code: "Y08", name: "Acid Yellow", hex: "#EAFF56" },
+            { code: "Y11", name: "Pale Yellow", hex: "#FFFFCC" },
+            { code: "Y13", name: "Lemon Yellow", hex: "#FFF44F" },
+            { code: "Y15", name: "Cadmium Yellow", hex: "#FFF600" },
+            { code: "Y17", name: "Golden Yellow", hex: "#FFD700" },
+            { code: "Y18", name: "Lightning Yellow", hex: "#FFCC00" },
+            { code: "Y19", name: "Napoli Yellow", hex: "#FFD800" },
+            { code: "Y21", name: "Buttercup Yellow", hex: "#F3E01C" },
+            { code: "Y23", name: "Yellowish Beige", hex: "#F5DEB3" },
+            { code: "Y26", name: "Mustard", hex: "#FFDB58" },
+            { code: "Y28", name: "Lionet Gold", hex: "#B8860B" },
+            
+            { code: "YG00", name: "Mimosa Yellow", hex: "#F4F2B1" },
+            { code: "YG01", name: "Green Bice", hex: "#E8F48C" },
+            { code: "YG03", name: "Yellow Green", hex: "#9ACD32" },
+            { code: "YG05", name: "Salad", hex: "#A1C935" },
+            { code: "YG06", name: "Yellowish Green", hex: "#8FBC8F" },
+            { code: "YG09", name: "Lettuce Green", hex: "#7BA428" },
+            { code: "YG11", name: "Mignonette", hex: "#D4E157" },
+            { code: "YG13", name: "Chartreuse", hex: "#7FFF00" },
+            { code: "YG17", name: "Grass Green", hex: "#7CFC00" },
+            { code: "YG21", name: "Anise", hex: "#B8D835" },
+            { code: "YG23", name: "New Leaf", hex: "#A7C796" },
+            { code: "YG25", name: "Celadon Green", hex: "#ACE1AF" },
+            
+            { code: "G000", name: "Pale Green", hex: "#E8F6E8" },
+            { code: "G00", name: "Jade Green", hex: "#A7E6D7" },
+            { code: "G02", name: "Spectrum Green", hex: "#5FB879" },
+            { code: "G03", name: "Meadow Green", hex: "#3CB371" },
+            { code: "G05", name: "Emerald Green", hex: "#50C878" },
+            { code: "G07", name: "Nile Green", hex: "#40826D" },
+            { code: "G09", name: "Veronese Green", hex: "#40826D" },
+            { code: "G12", name: "Sea Green", hex: "#2E8B57" },
+            { code: "G14", name: "Apple Green", hex: "#8DB600" },
+            { code: "G16", name: "Malachite", hex: "#0BDA51" },
+            { code: "G17", name: "Forest Green", hex: "#228B22" },
+            { code: "G19", name: "Bright Parrot Green", hex: "#32CD32" },
+            { code: "G20", name: "Wax White", hex: "#F0FFF0" },
+            { code: "G21", name: "Lime Green", hex: "#32CD32" },
+            { code: "G24", name: "Willow", hex: "#98D8C8" },
+            { code: "G28", name: "Ocean Green", hex: "#4F9D9D" },
+            { code: "G29", name: "Pine Tree Green", hex: "#2C5F2D" },
+            
+            { code: "BG000", name: "Pale Blue Green", hex: "#E0F6F0" },
+            { code: "BG01", name: "Aqua Blue", hex: "#7FFFD4" },
+            { code: "BG02", name: "New Blue", hex: "#00BFFF" },
+            { code: "BG05", name: "Holiday Blue", hex: "#00CED1" },
+            { code: "BG07", name: "Petroleum Blue", hex: "#4682B4" },
+            { code: "BG09", name: "Blue Green", hex: "#088F8F" },
+            { code: "BG10", name: "Cool Shadow", hex: "#B0E0E6" },
+            { code: "BG11", name: "Moon White", hex: "#E0F2F7" },
+            { code: "BG13", name: "Mint Green", hex: "#98FF98" },
+            { code: "BG15", name: "Aqua", hex: "#00FFFF" },
+            { code: "BG18", name: "Teal Blue", hex: "#008080" },
+            { code: "BG23", name: "Coral Sea", hex: "#4ECDC4" },
+            { code: "BG32", name: "Aqua Mint", hex: "#7FFFD4" },
+            { code: "BG34", name: "Horizon Green", hex: "#20B2AA" },
+            { code: "BG45", name: "Nile Blue", hex: "#76D7EA" },
+            { code: "BG49", name: "Duck Blue", hex: "#006994" },
+            
+            { code: "B000", name: "Pale Blue", hex: "#E6F3FF" },
+            { code: "B00", name: "Frost Blue", hex: "#D0E8F2" },
+            { code: "B01", name: "Mint Blue", hex: "#ADD8E6" },
+            { code: "B02", name: "Robin's Egg Blue", hex: "#00CCCC" },
+            { code: "B04", name: "Tahitian Blue", hex: "#1974D2" },
+            { code: "B05", name: "Process Blue", hex: "#0085C7" },
+            { code: "B06", name: "Peacock Blue", hex: "#005F73" },
+            { code: "B12", name: "Ice Blue", hex: "#C0E8E8" },
+            { code: "B14", name: "Light Blue", hex: "#87CEEB" },
+            { code: "B16", name: "Cyanine Blue", hex: "#4169E1" },
+            { code: "B18", name: "Lapis Lazuli", hex: "#26619C" },
+            { code: "B21", name: "Baby Blue", hex: "#89CFF0" },
+            { code: "B23", name: "Phthalo Blue", hex: "#000F89" },
+            { code: "B24", name: "Sky", hex: "#87CEEB" },
+            { code: "B26", name: "Cobalt Blue", hex: "#0047AB" },
+            { code: "B28", name: "Royal Blue", hex: "#4169E1" },
+            { code: "B29", name: "Ultramarine", hex: "#120A8F" },
+            { code: "B32", name: "Pale Blue", hex: "#B0C4DE" },
+            { code: "B34", name: "Manganese Blue", hex: "#0088CC" },
+            { code: "B37", name: "Antwerp Blue", hex: "#00416A" },
+            { code: "B39", name: "Prussian Blue", hex: "#003153" },
+            
+            { code: "V000", name: "Pale Thistle", hex: "#F5E6FF" },
+            { code: "V01", name: "Heath", hex: "#E6D7FF" },
+            { code: "V04", name: "Lilac", hex: "#C8A2C8" },
+            { code: "V05", name: "Mauve Shadow", hex: "#B784B7" },
+            { code: "V06", name: "Lavender", hex: "#967BB6" },
+            { code: "V09", name: "Violet", hex: "#8B00FF" },
+            { code: "V12", name: "Pale Lilac", hex: "#DDA0DD" },
+            { code: "V15", name: "Mallow", hex: "#D8BFD8" },
+            { code: "V17", name: "Amethyst", hex: "#9966CC" },
+            { code: "V20", name: "Wisteria", hex: "#C9A0DC" },
+            { code: "V22", name: "Ash Lavender", hex: "#B09DB9" },
+            { code: "V25", name: "Pale Blackberry", hex: "#B39EB5" },
+            { code: "V28", name: "Eggplant", hex: "#614051" },
+            { code: "V29", name: "Grape", hex: "#6F2DA8" },
+            
+            { code: "RV00", name: "Water Lily", hex: "#FFE4E1" },
+            { code: "RV02", name: "Sugared Almond Pink", hex: "#F9C5D1" },
+            { code: "RV04", name: "Shock Pink", hex: "#FC6C85" },
+            { code: "RV06", name: "Cerise", hex: "#DE3163" },
+            { code: "RV09", name: "Fuchsia", hex: "#FF00FF" },
+            { code: "RV10", name: "Pale Pink", hex: "#FFE5EC" },
+            { code: "RV11", name: "Pink", hex: "#FFC0CB" },
+            { code: "RV13", name: "Tender Pink", hex: "#FFB3D9" },
+            { code: "RV14", name: "Begonia Pink", hex: "#FA8072" },
+            { code: "RV17", name: "Deep Magenta", hex: "#D73B8F" },
+            { code: "RV19", name: "Red Violet", hex: "#C71585" },
+            { code: "RV21", name: "Light Pink", hex: "#FFB6C1" },
+            { code: "RV23", name: "Pure Pink", hex: "#FF69B4" },
+            { code: "RV25", name: "Dog Rose Flower", hex: "#FF1DCE" },
+            { code: "RV29", name: "Crimson", hex: "#DC143C" },
+            
+            { code: "E000", name: "Pale Fruit Pink", hex: "#FFF0F0" },
+            { code: "E00", name: "Skin White", hex: "#FFE4E1" },
+            { code: "E01", name: "Pink Flamingo", hex: "#FFD1DC" },
+            { code: "E02", name: "Fruit Pink", hex: "#FFB3BA" },
+            { code: "E04", name: "Lipstick Natural", hex: "#FF8B94" },
+            { code: "E07", name: "Cadmium Orange", hex: "#FF6B35" },
+            { code: "E08", name: "Brown", hex: "#A0522D" },
+            { code: "E09", name: "Burnt Sienna", hex: "#8B4513" },
+            { code: "E11", name: "Bareley Beige", hex: "#F5F5DC" },
+            { code: "E13", name: "Light Suntan", hex: "#D2B48C" },
+            { code: "E15", name: "Dark Suntan", hex: "#BC8F8F" },
+            { code: "E17", name: "Reddish Brass", hex: "#B87333" },
+            { code: "E18", name: "Copper", hex: "#B87333" },
+            { code: "E19", name: "Redwood", hex: "#A45A52" },
+            { code: "E21", name: "Baby Skin Pink", hex: "#FFF0F5" },
+            { code: "E23", name: "Hazelnut", hex: "#BC8F8F" },
+            { code: "E25", name: "Caribe Cocoa", hex: "#8B7355" },
+            { code: "E27", name: "Milk Chocolate", hex: "#7B3F00" },
+            { code: "E29", name: "Burnt Umber", hex: "#8A3324" },
+            { code: "E31", name: "Brick Beige", hex: "#C19A6B" },
+            { code: "E33", name: "Sand", hex: "#C2B280" },
+            { code: "E34", name: "Toast", hex: "#9F8170" },
+            { code: "E35", name: "Chamois", hex: "#F0DC82" },
+            { code: "E37", name: "Sepia", hex: "#704214" },
+            { code: "E39", name: "Leather", hex: "#8B4513" },
+            
+            { code: "W0", name: "Warm Gray 0", hex: "#F5F5F0" },
+            { code: "W1", name: "Warm Gray 1", hex: "#E8E8E0" },
+            { code: "W2", name: "Warm Gray 2", hex: "#DCDCD0" },
+            { code: "W3", name: "Warm Gray 3", hex: "#C8C8B8" },
+            { code: "W4", name: "Warm Gray 4", hex: "#B4B4A0" },
+            { code: "W5", name: "Warm Gray 5", hex: "#A0A088" },
+            { code: "W6", name: "Warm Gray 6", hex: "#8C8C70" },
+            { code: "W7", name: "Warm Gray 7", hex: "#787860" },
+            { code: "W8", name: "Warm Gray 8", hex: "#646450" },
+            { code: "W9", name: "Warm Gray 9", hex: "#505040" },
+            { code: "W10", name: "Warm Gray 10", hex: "#3C3C30" },
+            
+            { code: "C0", name: "Cool Gray 0", hex: "#F5F5F5" },
+            { code: "C1", name: "Cool Gray 1", hex: "#E8E8E8" },
+            { code: "C2", name: "Cool Gray 2", hex: "#DCDCDC" },
+            { code: "C3", name: "Cool Gray 3", hex: "#C8C8C8" },
+            { code: "C4", name: "Cool Gray 4", hex: "#B4B4B4" },
+            { code: "C5", name: "Cool Gray 5", hex: "#A0A0A0" },
+            { code: "C6", name: "Cool Gray 6", hex: "#8C8C8C" },
+            { code: "C7", name: "Cool Gray 7", hex: "#787878" },
+            { code: "C8", name: "Cool Gray 8", hex: "#646464" },
+            { code: "C9", name: "Cool Gray 9", hex: "#505050" },
+            { code: "C10", name: "Cool Gray 10", hex: "#3C3C3C" },
+            
+            { code: "100", name: "Black", hex: "#000000" },
+            { code: "110", name: "Special Black", hex: "#1A1A1A" },
+            { code: "0", name: "Colorless Blender", hex: "#FFFFFF" }
+        ];
+
+        let currentPalette = [];
+        let lockedColors = new Set();
+
+        function generatePalette() {
+            const paletteSize = parseInt(document.getElementById('paletteSize').value);
+            const palette = document.getElementById('palette');
+            
+            // Keep locked colors, generate new ones for unlocked
+            const newPalette = [];
+            
+            for (let i = 0; i < paletteSize; i++) {
+                if (i < currentPalette.length && lockedColors.has(i)) {
+                    // Keep locked color
+                    newPalette.push(currentPalette[i]);
+                } else {
+                    // Generate new random color
+                    const randomColor = ohuhuColors[Math.floor(Math.random() * ohuhuColors.length)];
+                    newPalette.push(randomColor);
+                }
+            }
+            
+            currentPalette = newPalette;
+            renderPalette();
+        }
+
+        function renderPalette() {
+            const palette = document.getElementById('palette');
+            palette.innerHTML = '';
+            
+            currentPalette.forEach((color, index) => {
+                const card = document.createElement('div');
+                card.className = 'color-card';
+                card.draggable = true;
+                card.dataset.index = index;
+                
+                card.innerHTML = `
+                    <svg class="drag-icon" viewBox="0 0 24 24">
+                        <circle cx="9" cy="5" r="1.5"/>
+                        <circle cx="15" cy="5" r="1.5"/>
+                        <circle cx="9" cy="12" r="1.5"/>
+                        <circle cx="15" cy="12" r="1.5"/>
+                        <circle cx="9" cy="19" r="1.5"/>
+                        <circle cx="15" cy="19" r="1.5"/>
+                    </svg>
+                    <div class="color-swatch" style="background-color: ${color.hex}"></div>
+                    <div class="color-info">
+                        <div class="color-code">${color.code}</div>
+                        <div class="color-name">${color.name}</div>
+                    </div>
+                    <button class="lock-btn ${lockedColors.has(index) ? 'locked' : ''}" onclick="toggleLock(${index})">
+                        <svg viewBox="0 0 24 24">
+                            ${lockedColors.has(index) 
+                                ? '<path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>'
+                                : '<path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h2c0-1.66 1.34-3 3-3s3 1.34 3 3v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>'
+                            }
+                        </svg>
+                    </button>
+                `;
+                
+                // Drag and drop
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragover', handleDragOver);
+                card.addEventListener('drop', handleDrop);
+                card.addEventListener('dragend', handleDragEnd);
+                
+                palette.appendChild(card);
+            });
+        }
+
+        function toggleLock(index) {
+            if (lockedColors.has(index)) {
+                lockedColors.delete(index);
+            } else {
+                lockedColors.add(index);
+            }
+            renderPalette();
+        }
+
+        let draggedIndex = null;
+
+        function handleDragStart(e) {
+            draggedIndex = parseInt(e.currentTarget.dataset.index);
+            e.currentTarget.classList.add('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const dropIndex = parseInt(e.currentTarget.dataset.index);
+            
+            if (draggedIndex !== dropIndex) {
+                // Swap colors
+                const temp = currentPalette[draggedIndex];
+                currentPalette[draggedIndex] = currentPalette[dropIndex];
+                currentPalette[dropIndex] = temp;
+                
+                // Update locked indices
+                const wasSourceLocked = lockedColors.has(draggedIndex);
+                const wasTargetLocked = lockedColors.has(dropIndex);
+                
+                lockedColors.delete(draggedIndex);
+                lockedColors.delete(dropIndex);
+                
+                if (wasSourceLocked) lockedColors.add(dropIndex);
+                if (wasTargetLocked) lockedColors.add(draggedIndex);
+                
+                renderPalette();
+            }
+        }
+
+        function handleDragEnd(e) {
+            e.currentTarget.classList.remove('dragging');
+            draggedIndex = null;
+        }
+
+        // Handle palette size changes
+        document.getElementById('paletteSize').addEventListener('change', () => {
+            const newSize = parseInt(document.getElementById('paletteSize').value);
+            const currentSize = currentPalette.length;
+            
+            if (newSize > currentSize) {
+                // Add more colors
+                for (let i = currentSize; i < newSize; i++) {
+                    const randomColor = ohuhuColors[Math.floor(Math.random() * ohuhuColors.length)];
+                    currentPalette.push(randomColor);
+                }
+            } else if (newSize < currentSize) {
+                // Remove colors from the end
+                currentPalette = currentPalette.slice(0, newSize);
+                // Update locked colors set
+                lockedColors = new Set([...lockedColors].filter(i => i < newSize));
+            }
+            
+            renderPalette();
+        });
+
+        // Keyboard shortcut for space bar
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
+                e.preventDefault();
+                generatePalette();
+            }
+        });
+
+        // Initialize with a random palette
+        generatePalette();
+    </script>
+</body>
+</html>
