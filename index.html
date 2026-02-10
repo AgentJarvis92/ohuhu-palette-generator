@@ -175,14 +175,16 @@
         }
 
         .palette {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            display: flex;
             gap: 15px;
             margin-bottom: 20px;
+            overflow-x: auto;
         }
 
         .color-swatch {
             position: relative;
+            flex: 1;
+            min-width: 150px;
             height: 180px;
             border-radius: 12px;
             cursor: grab;
@@ -253,6 +255,8 @@
             font-size: 14px;
             color: #666;
             font-weight: 500;
+            flex: 1;
+            min-width: 150px;
         }
 
         .instructions {
@@ -368,12 +372,13 @@
                 font-size: 32px;
             }
             
-            .palette {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            .color-swatch {
+                min-width: 120px;
+                height: 140px;
             }
             
-            .color-swatch {
-                height: 140px;
+            .color-name {
+                min-width: 120px;
             }
         }
     </style>
@@ -425,7 +430,7 @@
 
             <div class="palette-display">
                 <div class="palette" id="palette"></div>
-                <div id="colorNames" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;"></div>
+                <div id="colorNames" style="display: flex; gap: 15px;"></div>
             </div>
 
             <div class="instructions">
@@ -468,7 +473,7 @@
                 
                 <div class="palette-display">
                     <div class="palette" id="imagePalette"></div>
-                    <div id="imageColorNames" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;"></div>
+                    <div id="imageColorNames" style="display: flex; gap: 15px;"></div>
                 </div>
             </div>
         </div>
