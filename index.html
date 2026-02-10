@@ -223,6 +223,19 @@
                 </select>
             </div>
             
+            <div class="control-group">
+                <label for="colorStyle">Color Style</label>
+                <select id="colorStyle">
+                    <option value="all" selected>All colors</option>
+                    <option value="warm">Warm colors</option>
+                    <option value="cool">Cool colors</option>
+                    <option value="pastel">Pastels</option>
+                    <option value="bright">Bright/Vibrant</option>
+                    <option value="earth">Earth tones</option>
+                    <option value="neutral">Neutrals</option>
+                </select>
+            </div>
+            
             <button class="generate-btn" onclick="generatePalette()">
                 🎲 Generate Palette
             </button>
@@ -452,9 +465,43 @@
         let currentPalette = [];
         let lockedColors = new Set();
 
+        // Color categorization
+        const colorCategories = {
+            warm: ['R', 'YR', 'Y', 'E'],
+            cool: ['B', 'BG', 'G', 'V'],
+            pastel: ['000', '00', '01', '02', '10', '11', '12', '20', '21'],
+            bright: ['04', '05', '06', '07', '08', '09', '14', '15', '16', '17', '18', '19'],
+            earth: ['E', 'YR2', 'YR3', 'Y2', 'W', 'C'],
+            neutral: ['W', 'C', '100', '110', '0']
+        };
+
+        function getFilteredColors(style) {
+            if (style === 'all') return ohuhuColors;
+            
+            const category = colorCategories[style];
+            return ohuhuColors.filter(color => {
+                const code = color.code;
+                
+                // Check if color matches the category
+                return category.some(pattern => {
+                    if (pattern.length <= 2) {
+                        // Color family match (R, YR, B, etc)
+                        return code.startsWith(pattern);
+                    } else {
+                        // Specific number pattern match
+                        return code.includes(pattern);
+                    }
+                });
+            });
+        }
+
         function generatePalette() {
             const paletteSize = parseInt(document.getElementById('paletteSize').value);
+            const colorStyle = document.getElementById('colorStyle').value;
             const palette = document.getElementById('palette');
+            
+            // Get filtered color pool based on style
+            const availableColors = getFilteredColors(colorStyle);
             
             // Keep locked colors, generate new ones for unlocked
             const newPalette = [];
@@ -464,8 +511,8 @@
                     // Keep locked color
                     newPalette.push(currentPalette[i]);
                 } else {
-                    // Generate new random color
-                    const randomColor = ohuhuColors[Math.floor(Math.random() * ohuhuColors.length)];
+                    // Generate new random color from filtered pool
+                    const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
                     newPalette.push(randomColor);
                 }
             }
