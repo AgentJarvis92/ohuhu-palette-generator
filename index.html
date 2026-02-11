@@ -748,6 +748,11 @@
                 }
                 
                 return category.some(pattern => {
+                    // For pastel/bright patterns (numeric suffixes), check if code ENDS with pattern
+                    if (style === 'pastel' || style === 'bright') {
+                        return code.endsWith(pattern);
+                    }
+                    // For other categories, check if code starts with or includes pattern
                     if (pattern.length <= 2) {
                         return code.startsWith(pattern);
                     } else {
