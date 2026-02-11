@@ -741,6 +741,12 @@
             const category = colorCategories[style];
             return ohuhuColors.filter(color => {
                 const code = color.code;
+                
+                // Exclude purely numeric codes (100, 110, 0) from pastel filter
+                if (style === 'pastel' && /^\d+$/.test(code)) {
+                    return false;
+                }
+                
                 return category.some(pattern => {
                     if (pattern.length <= 2) {
                         return code.startsWith(pattern);
