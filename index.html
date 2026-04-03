@@ -463,7 +463,7 @@
             <p class="subtitle">Extract Ohuhu colors from any image</p>
             
             <div class="upload-area" onclick="document.getElementById('imageInput').click()" 
-                 ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                 ondrop="handleUploadDrop(event)" ondragover="handleUploadDragOver(event)" ondragleave="handleUploadDragLeave(event)">
                 <div class="upload-icon">🖼️</div>
                 <div class="upload-text">Click to upload or drag & drop</div>
                 <div class="upload-subtext">PNG, JPG, WEBP up to 10MB</div>
@@ -905,16 +905,16 @@
         }
 
         // Image upload functions
-        function handleDragOver(e) {
+        function handleUploadDragOver(e) {
             e.preventDefault();
             e.currentTarget.classList.add('dragover');
         }
 
-        function handleDragLeave(e) {
+        function handleUploadDragLeave(e) {
             e.currentTarget.classList.remove('dragover');
         }
 
-        function handleDrop(e) {
+        function handleUploadDrop(e) {
             e.preventDefault();
             e.currentTarget.classList.remove('dragover');
             const file = e.dataTransfer.files[0];
